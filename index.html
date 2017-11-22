@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <script src='./js/angular.min.js'></script>
+    <script src='./js/angular-ui-router.js'></script>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body ng-app='test'>
+    <div class='box'>
+        <p>搜索框：<input type="text" ng-model="ttx"><button ng-click='find()'>搜索</button></p>
+        <ul>
+            <li>选择</li>
+            <li>姓名</li>
+            <li>编号</li>
+            <li>群体</li>
+            <li>操作</li>
+        </ul>  
+        <div ui-view></div>  
+    </div>
+    
+    <mydir></mydir>
+    <script>
+        var app=angular.module('test',['ui.router']);
+        app.config(function($stateProvider,$urlRouterProvider){
+            $urlRouterProvider.otherwise('indexs')
+            $stateProvider
+                .state('indexs',{
+                    url:'/indexs',
+                    //template:'{{data}}',
+                    template:'<ol ng-repeat ="i in str"><li><span></span></li><li>{{i.name}}</li><li>{{i.num}}</li><li>{{i.tit}}</li><li><button>删除</button></li></ol>',
+                })
+        })
+        app.directive('mydir',function(){
+            return {
+                restrict:'AE',
+                controller:function($scope,$http,$rootScope,$state,$filter,myha){
+                    $http({
+                        method:'GET',
+                        url:'http://localhost:8080/getdata'
+                    }).then(function(response){
+                        $rootScope.data = response.data.data;
+                        $scope.str=$filter('filter')($rootScope.data,{"num":''}); console.log($scope.str)
+                    })
+                    $scope.ttx='';
+                    //$scope.hh = myha.shuju;
+                    $scope.find=function(){
+                        $scope.str=$filter('filter')($rootScope.data,{"num":$scope.ttx});
+                    }
+                }
+            }
+        })
+        app.service('myha',function(){
+            return {
+                "shuju":[
+                    {
+                        "id":"1",
+                        "name":"zhangsan",
+                        "num":"222222",
+                        "tit":"手机客户",
+                        "":""
+                    },
+                    {
+                        "id":"1",
+                        "name":"zhangsan",
+                        "num":"355553",
+                        "tit":"手机客户",
+                        "":""
+                    }
+                ]
+            }
+        })
+    </script>
+</body>
+</html>
